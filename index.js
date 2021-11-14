@@ -37,33 +37,23 @@ app.get("/", (req, res) => {
     res.render('landing.hbs', {name: myName, age: 19})
 });
 
-app.get('/students', (req, res) => {
-    // Consuming a promise here
-    getStudents()
-        .then(( myStudents ) => {
-            console.log(myStudents)
-            let uppercaseNames = myStudents.map((student) => {
-                student.name = student.name.toUpperCase()
-                return student
-            })
-        
-            res.render('students.hbs', {students: uppercaseNames})
-        })
-        .catch(() => {
-            console.log('Students failed to fetch')
-        })
+const studentRoutes=require('./routes/Student.routes')
+app.use('/',studentRoutes)
+
+const instructorsRoutes=require('./routes/Instructors.routes')
+app.use('/',instructorsRoutes)
+
+
+//404 middleware
+app.use((req, res, next) => {
+    res.status(404).send('Page not found dude!')
 })
 
-app.get('/instructors', (req, res) => {
-    // Consuming a promise here
-    getTeachers()
-        .then(( teachers) => {    
-            res.render('instructors.hbs', {instructors: teachers, layout: false})
-        })
-        .catch(() => {
-            console.log('Instructors failed to fetch')
-        })
+//Error handling middleware->has 4 arguments
+app.use((err,req,res,next)=>{
+    res.send(500).send(err)
 })
+
 
 // Express setup to listen for all client requests on a certain port
 app.listen(port, () =>
